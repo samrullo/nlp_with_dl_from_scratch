@@ -28,8 +28,8 @@ def cross_entropy_error(y,t):
         # each element specifies correct class number.
         # in the case of word2vec each element represents word ID
         # if labels and predicted values have the same size, it means labels are also represented as two dimensional data
-        # and each element of labels is a sparse vector with size V where one value is non zero and all other values are zero        
+        # and each element of labels is a one-hot vector with size V where one value is non zero and all other values are zero
         t = np.argmax(t, axis=1)
     
     batch_size = y.shape[0]
-    return - np.sum(np.log(y[np.arange(batch_size), t] + 1e-7))
+    return -np.sum(np.log(y[np.arange(batch_size), t] + 1e-7))
