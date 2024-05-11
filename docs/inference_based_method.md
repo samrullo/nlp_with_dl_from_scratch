@@ -112,20 +112,46 @@ Let's see CBOW from layer perspective:
 - **Softmax**: A softmax function is applied to output probabilities corresponding to each word in the vocabulary.
 
 
-
+CBOW inference in code
 
 ```python
-def create_contexts(corpus:List[int],window_size:int):
-    targets = corpus[window_size : - window_size]
-    contexts = []
+c0 = np.array([[1,0,0...]])
+c1 = np.array([[0,0,1...]])
 
-    for idx in range(window_size, len(corpus)-window_size):
-        cs = []
-        for t in range(-window_size, window_size):
-            if t == 0:
-                continue
-            cs.append(corpus[idx + t])
-        contexts.append(cs)
-    return np.array(contexts), np.array(targets)
+# Initialize weights
+W_in = np.random.rand(7,3)  # (1)
+W_out = np.random.rand(3,7) # (2)
+
+# Layers
+in_layer0 = MatMul(W_in)   # (3)
+in_layer1 = MatMul(W_in)   # (4)
+out_layer = MatMul(W_out)  # (5)
+
+h0 = in_layer0.forward(c0) # (6)
+h1 = in_layer1.forward(c1) # (7)
+h = (h0 + h1) * 0.5        # (8)
+out = out_layer.forward(h) # (9)
 ```
 
+1. First we initialize weight matrices.
+2. Next we instantiate MatMul layers matching the number of contexts (z in this case).
+3. Initialize output layer.
+4. Pass each context through corresponding input layers.
+5. Take the mean of the results of passing contexts through input layers.
+6. Pass the mean from step 5 and calculate scores corresponding to each word in the vocabulary.
+
+
+It is experimentally observed that vector representation of words derived by training CBOW (or skip-gram model) on a huge dataset like Wikipedia matches our intuitive understanding regarding the meaning and grammatical rules.
+
+CBOW model uses learning occurrence patterns of words in a corpus. Therefore, depending on the kind of corpus, derived vector representations of words will differ. You'll obtain different results when you train on articles about sport vs music.
+
+We're dealing with a multi-classification problem. Our network should output probability for each class. "class" is a word in the vocabulary. We'll use Softmax to convert scores to probabilities and ```Cross Entropy Loss``` to compare model predictions against ground truth.
+
+
+![CBOW Diagram with loss](cbow_diagram_with_loss.jpg)
+
+We need to prepare dataset. In classic machine learning, we train our model on a dataset \(X\) where \(X\) is input and \(Y\) is true label.
+
+Below illustrates how we will gather such dataset
+
+![Illustrate dataset gathering](preparing_context_targets_illustration.jpg)
