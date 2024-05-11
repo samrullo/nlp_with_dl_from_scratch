@@ -26,7 +26,7 @@ def create_contexts_and_targets(corpus:List[int], window_size:int):
     Prepare targets and contexts from a corpus
     """
     targets = corpus[window_size : -window_size]
-    contexts = [ [corpus[i+t] for t in range(-window_size, window_size) if t != 0] for i in range(window_size, len(corpus)-window_size)]
+    contexts = [ [corpus[i+t] for t in range(-window_size, window_size+1) if t != 0] for i in range(window_size, len(corpus)-window_size)]
     return contexts, targets
 
 def clip_grads(grads, max_norm):
